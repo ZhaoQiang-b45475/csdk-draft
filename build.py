@@ -1,6 +1,8 @@
 from flask import Flask
 from flask import request
 from flask import render_template
+from flask import send_file
+from flask import send_from_directory
 import os
 from getpass import getuser
 
@@ -12,6 +14,11 @@ builddir = buildpdir + "flexbuild/"
 @app.route("/", methods = ['GET'])
 def home():
 	return render_template('form.html')
+
+@app.route("/download/<filename>", methods = ['GET'])
+def download_file(filename):
+        directory = os.getcwd() + "/download"
+	return send_from_directory(directory, filename, as_attachment=True)
 
 @app.route("/build", methods = ['POST'])
 def build():
