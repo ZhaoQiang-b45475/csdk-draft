@@ -1,0 +1,15 @@
+<html>
+<head>
+	<title>Please type machine</title>
+</head>
+<body>
+	{% if message %}
+	<p style="color:red">{{ message }}</p>
+	{% endif %}
+	<form action="/build" method="post">
+	  <legend>Please type machine:</legend>
+	  <p>machine:<input name=machine placeholder="machine" value="{{ machine }}"></p>
+	  <p><button type="submit">Build</button></p>
+	</form>
+</body>
+</html>
