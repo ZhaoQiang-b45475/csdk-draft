@@ -6,6 +6,8 @@ from flask import send_from_directory
 import os
 from getpass import getuser
 
+from myfunc import *
+
 app = Flask(__name__)
 osusername = getuser()
 buildpdir = "/home/" + osusername + "/work/"
@@ -27,6 +29,7 @@ def build():
 		os.chdir(buildpdir)
 		os.system("git clone ssh://git@bitbucket.sw.nxp.com/dash/flexbuild.git")
 	os.chdir(builddir)
+        enEdge()
 	os.system("source ./setup.env && flex-builder all")
 	return "clone success"
 
