@@ -9,7 +9,14 @@
 	<form action="/build" method="post">
 	  <legend>Please type machine:</legend>
 	  <p>machine:<input name=machine placeholder="machine" value="{{ machine }}"></p>
-	  <p><button type="submit">Build</button></p>
+	  <div style="width:65px;float:left">
+	  <button type="submit" style="width:60px">Build</button>
+	  </div>
+	</form>
+	<form action="/deploy" method="get">
+	  <div style="width:65px;float:left">
+	  <button type="submit" style="width:60px">Deploy</button>
+	  </div>
 	</form>
 </body>
 </html>
