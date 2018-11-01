@@ -58,6 +58,8 @@ def build(message):
 @socketio.on('deploy', namespace='/test')
 def deploy(message):
     emit('my_response', {'data': 'Starting deploy...'})
+    command = "escli  login --username alison\.wang@nxp.com --password 12345678"
+    os.system(command)
     command = "escli task deploy-solution --device_id 1315 --id 502"
     os.system(command)
     emit('my_response', {'data': 'Deploy finished...'})
