@@ -37,18 +37,23 @@ def download_file(filename):
 
 @socketio.on('build', namespace='/test')
 def build(message):
-    machine = message['data']
-    if not os.path.exists(builddir):
-        emit("my_response", {"data": "Starting clone..."})
-        os.chdir(buildpdir)
-        os.system("git clone ssh://git@bitbucket.sw.nxp.com/dash/flexbuild.git")
-        emit("my_response", {"data": "Finish clone..."})
-    emit("my_response", {"data": "Starting build..."})
-    os.chdir(builddir)
-    enEdge()
-    os.system("source ./setup.env && flex-builder all")
-    mksolution()
-    emit("my_response", {"data": "Finish build..."})
+    machine = message['data'].strip()
+    print machine
+    if ('ls1043ardb' in machine):
+        if not os.path.exists(builddir):
+            emit("my_response", {"data": "Starting clone..."})
+            os.chdir(buildpdir)
+            os.system("git clone ssh://git@bitbucket.sw.nxp.com/dash/flexbuild.git")
+            emit("my_response", {"data": "Finish clone..."})
+        emit("my_response", {"data": "Starting build %s, will take a long time..." % machine})
+        os.chdir(builddir)
+        enEdge()
+        command = "source ./setup.env && flex-builder -m ls1043ardb -a arm64"
+        os.system(command)
+        mksolution()
+        emit("my_response", {"data": "Finish build..."})
+    else:
+        emit("my_response", {"data": "Doesn't support machine %s" % machine})
 
 @socketio.on('deploy', namespace='/test')
 def deploy(message):
