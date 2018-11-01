@@ -1,10 +1,7 @@
-from flask import Flask
-from flask import request
-from flask import render_template
-from flask import send_file
-from flask import send_from_directory
+from flask import Flask, request, render_template, send_file, send_from_directory
 from getpass import getuser
 from flask_socketio import SocketIO, emit, disconnect
+#from threading import Lock
 import os
 
 from myfunc import *
@@ -18,7 +15,17 @@ socketio = SocketIO(app, async_mode=async_mode)
 osusername = getuser()
 buildpdir = "/home/" + osusername + "/work/"
 builddir = buildpdir + "flexbuild/"
-
+'''
+thread = None
+thread_lock = Lock()
+def background_thread():
+    """Example of how to send server generated events to clients."""
+    while True:
+        socketio.sleep(10)
+        socketio.emit('keep_connect',
+                      {'data': 'Server generated event'},
+                      namespace='/test')
+'''
 @app.route("/")
 def home():
     return render_template('form.html', async_mode=socketio.async_mode)
@@ -50,9 +57,19 @@ def deploy(message):
     os.system(command)
     emit('my_response', {'data': 'Deploy finished...'})
 
+@socketio.on('my_event', namespace='/test')
+def test_connect(message):
+    print message['data']
+
 @socketio.on('connect', namespace='/test')
 def test_connect():
-    emit('my_response', {'data': 'Connected'})
+    '''
+    global thread
+    with thread_lock:
+        if thread is None:
+            thread = socketio.start_background_task(target=background_thread)
+    '''
+    emit('my_response', {'data': 'Connected to Server!'})
 
 
 @socketio.on('disconnect', namespace='/test')
