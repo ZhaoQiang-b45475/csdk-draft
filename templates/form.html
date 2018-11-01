@@ -1,22 +1,67 @@
 <html>
 <head>
 	<title>Please type machine</title>
+	<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+	<script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            // Use a "/test" namespace.
+            // An application can open a connection on multiple namespaces, and
+            // Socket.IO will multiplex all those connections on a single
+            // physical channel. If you don't care about multiple channels, you
+            // can set the namespace to an empty string.
+            namespace = '/test';
+
+            // Connect to the Socket.IO server.
+            // The connection URL has the following format:
+            //     http[s]://<domain>:<port>[/<namespace>]
+            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+            // Event handler for new connections.
+            // The callback function is invoked when a connection with the
+            // server is established.
+            socket.on('connect', function() {
+                socket.emit('my_event', {data: 'Connected to server!'});
+            });
+
+            // Event handler for server sent data.
+            // The callback function is invoked whenever the server emits data
+            // to the client. The data is then displayed in the "Received"
+            // section of the page.
+            socket.on('my_response', function(msg) {
+                $('#log').append('<br>' + $('<div/>').text('Received' + ': ' + msg.data).html());
+            });
+
+            // Handlers for the different forms in the page.
+            // These accept data from the user and send it to the server in a
+            // variety of ways
+            $('form#build').submit(function(event) {
+                socket.emit('build', {data: $('#build_data').val()});
+                return false;
+            });
+            $('form#deploy').submit(function(event) {
+		socket.emit('deploy', {data: "deploy"});
+                return false;
+            });
+        });
+	</script>
 </head>
 <body>
 	{% if message %}
 	<p style="color:red">{{ message }}</p>
 	{% endif %}
-	<form action="/build" method="post">
+	<form id="build" method="POST" action='#'>
 	  <legend>Please type machine:</legend>
-	  <p>machine:<input name=machine placeholder="machine" value="{{ machine }}"></p>
+	  <p>machine:<input type="text" name=machine id="build_data" placeholder="machine" ></p>
 	  <div style="width:65px;float:left">
-	  <button type="submit" style="width:60px">Build</button>
+	  <input type="submit" value="Build" style="width:60px">
 	  </div>
 	</form>
-	<form action="/deploy" method="get">
+	<form id="deploy" method="GET" action='#'>
 	  <div style="width:65px;float:left">
-	  <button type="submit" style="width:60px">Deploy</button>
+	  <input type="submit" value='Deploy' style="width:60px">
 	  </div>
 	</form>
+	<div id="log"></div>
 </body>
 </html>
