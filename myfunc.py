@@ -3,7 +3,7 @@
 import os
 import shutil
 
-filename = "./configs/build_lsdk_internal.cfg"
+filename = "./configs/build_lsdk.cfg"
 imagedir = "/home/zhaoqiang/work/flexbuild/build/images/"
 soluname = "edgescale-solution.tgz"
 firmware = "firmware_ls1043ardb_uboot_sdboot.img"

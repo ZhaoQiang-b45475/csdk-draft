@@ -11,10 +11,13 @@ async_mode = None
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "secret"
 socketio = SocketIO(app, async_mode=async_mode)
+connection = 0
+messagelist = []
 
 osusername = getuser()
 buildpdir = "/home/" + osusername + "/work/"
 builddir = buildpdir + "flexbuild/"
+
 '''
 thread = None
 thread_lock = Lock()
@@ -26,6 +29,13 @@ def background_thread():
                       {'data': 'Server generated event'},
                       namespace='/test')
 '''
+
+def sendmessage(message):
+    if connection == 1:
+        emit("my_response", {"data": message})
+    else:
+        messagelist.append(message)
+
 @app.route("/")
 def home():
     return render_template('form.html', async_mode=socketio.async_mode)
@@ -51,7 +61,8 @@ def build(message):
         command = "source ./setup.env && flex-builder -m ls1043ardb -a arm64"
         os.system(command)
         mksolution()
-        emit("my_response", {"data": "Finish build..."})
+        print "=============connection = %d" % connection
+        sendmessage("Finish build...")
     else:
         emit("my_response", {"data": "Doesn't support machine %s" % machine})
 
@@ -76,11 +87,15 @@ def test_connect():
         if thread is None:
             thread = socketio.start_background_task(target=background_thread)
     '''
+    connection = 1
     emit('my_response', {'data': 'Connected to Server!'})
+    while (len(messagelist) != 0):
+        emit('my_response', {'data': messagelist.pop(0)})
 
 
 @socketio.on('disconnect', namespace='/test')
 def test_disconnect():
+    connection = 0
     print('Client disconnected', request.sid)
 
 if __name__ == '__main__':
