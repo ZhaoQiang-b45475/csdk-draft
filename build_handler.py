@@ -36,8 +36,9 @@ def realbuild():
     print "=============finish build"
     if not ret:
         mksolution()
-    print "=============finish tar"
-    modifyfile(csdkdir+"/"+buildconf, "EDGEBUILD=1", "EDGEBUILD=0")
+        modifyfile(csdkdir+"/"+buildconf, "EDGEBUILD=1", "EDGEBUILD=4")
+    else:
+        modifyfile(csdkdir+"/"+buildconf, "EDGEBUILD=1", "EDGEBUILD=3")
 
 if __name__ == '__main__':
     build_handler()

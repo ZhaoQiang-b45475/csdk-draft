@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, send_file, send_from_directory
 from getpass import getuser
 from flask_socketio import SocketIO, emit, disconnect
-#from threading import Lock
+from threading import Lock
 import os
 import fcntl
 
@@ -19,19 +19,20 @@ osusername = getuser()
 buildpdir = "/home/" + osusername + "/work/"
 builddir = buildpdir + "flexbuild/"
 buildconf = "buildconf"
-csdkdir = ""
+csdkdir = os.getcwd()
 
-'''
 thread = None
 thread_lock = Lock()
+
 def background_thread():
-    """Example of how to send server generated events to clients."""
     while True:
-        socketio.sleep(10)
-        socketio.emit('keep_connect',
-                      {'data': 'Server generated event'},
-                      namespace='/test')
-'''
+        socketio.sleep(5)
+        if readstrfromfile(csdkdir+"/"+buildconf, "EDGEBUILD=3"):
+            socketio.emit("my_response", {"data": "Build failed..."}, namespace='/test')
+            modifyfile(csdkdir+"/"+buildconf, "EDGEBUILD=3", "EDGEBUILD=0")
+        elif readstrfromfile(csdkdir+"/"+buildconf, "EDGEBUILD=4"):
+            socketio.emit("my_response", {"data": "Build success..."})
+            modifyfile(csdkdir+"/"+buildconf, "EDGEBUILD=4", "EDGEBUILD=0", namespace='/test')
 
 def sendmessage(message):
     if connection == 1:
@@ -73,12 +74,10 @@ def test_connect(message):
 
 @socketio.on('connect', namespace='/test')
 def test_connect():
-    '''
     global thread
     with thread_lock:
         if thread is None:
             thread = socketio.start_background_task(target=background_thread)
-    '''
     connection = 1
     emit('my_response', {'data': 'Connected to Server!'})
     while (len(messagelist) != 0):
