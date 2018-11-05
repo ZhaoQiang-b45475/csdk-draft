@@ -3,6 +3,7 @@ from getpass import getuser
 from flask_socketio import SocketIO, emit, disconnect
 #from threading import Lock
 import os
+import fcntl
 
 from myfunc import *
 
@@ -59,8 +60,12 @@ def build(message):
                     emit("my_response", {"data": "Start to build %s, Maybe take a long time..." % machine})
                     line = line.replace("EDGEBUILD=0", "EDGEBUILD=1")
                 file_data += line
+            f.close()
         with open(buildconf, "w") as f:
+            fcntl.flock(f, fcntl.LOCK_EX)
             f.write(file_data)
+            fcntl.flock(f, fcntl.LOCK_UN)
+            f.close()
     else:
         emit("my_response", {"data": "Doesn't support machine %s" % machine})
 

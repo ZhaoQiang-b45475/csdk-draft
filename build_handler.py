@@ -1,6 +1,7 @@
 import time
 from getpass import getuser
 import os
+import fcntl
 
 from myfunc import *
 
@@ -36,6 +37,19 @@ def realbuild():
     if not ret:
         mksolution()
     print "=============finish tar"
+    os.chdir(csdkdir)
+    file_data = ""
+    with open(buildconf, "r") as f:
+        for line in f:
+            if "EDGEBUILD=1" in line:
+                line = line.replace("EDGEBUILD=1", "EDGEBUILD=0")
+            file_data += line
+        f.close()
+    with open(buildconf, "w") as f:
+        fcntl.flock(f, fcntl.LOCK_EX)
+        f.write(file_data)
+        fcntl.flock(f, fcntl.LOCK_UN)
+        f.close()
 
 if __name__ == '__main__':
     build_handler()
