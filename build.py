@@ -53,19 +53,9 @@ def build(message):
     machine = message['data'].strip()
     print machine
     if ('ls1043ardb' in machine):
-        file_data = ""
-        with open(buildconf, "r") as f:
-            for line in f:
-                if "EDGEBUILD=0" in line:
-                    emit("my_response", {"data": "Start to build %s, Maybe take a long time..." % machine})
-                    line = line.replace("EDGEBUILD=0", "EDGEBUILD=1")
-                file_data += line
-            f.close()
-        with open(buildconf, "w") as f:
-            fcntl.flock(f, fcntl.LOCK_EX)
-            f.write(file_data)
-            fcntl.flock(f, fcntl.LOCK_UN)
-            f.close()
+        if readstrfromfile(buildconf, "EDGEBUILD=0"):
+            emit("my_response", {"data": "Start to build %s, Maybe take a long time..." % machine})
+            modifyfile(buildconf, "EDGEBUILD=0", "EDGEBUILD=1")
     else:
         emit("my_response", {"data": "Doesn't support machine %s" % machine})
 
@@ -76,7 +66,6 @@ def deploy(message):
     os.system(command)
     command = "escli task deploy-solution --device_id 1315 --id 502"
     os.system(command)
-    emit('my_response', {'data': 'Deploy finished...'})
 
 @socketio.on('my_event', namespace='/test')
 def test_connect(message):
