@@ -17,6 +17,7 @@ messagelist = []
 osusername = getuser()
 buildpdir = "/home/" + osusername + "/work/"
 builddir = buildpdir + "flexbuild/"
+buildconf = "buildconf"
 
 '''
 thread = None
@@ -50,19 +51,15 @@ def build(message):
     machine = message['data'].strip()
     print machine
     if ('ls1043ardb' in machine):
-        if not os.path.exists(builddir):
-            emit("my_response", {"data": "Starting clone..."})
-            os.chdir(buildpdir)
-            os.system("git clone ssh://git@bitbucket.sw.nxp.com/dash/flexbuild.git")
-            emit("my_response", {"data": "Finish clone..."})
-        emit("my_response", {"data": "Starting build %s, will take a long time..." % machine})
-        os.chdir(builddir)
-        enEdge()
-        command = "source ./setup.env && flex-builder -m ls1043ardb -a arm64"
-        os.system(command)
-        mksolution()
-        print "=============connection = %d" % connection
-        sendmessage("Finish build...")
+        file_data = ""
+        with open(buildconf, "r") as f:
+            for line in f:
+                if "EDGEBUILD=0" in line:
+                    emit("my_response", {"data": "Start to build %s, Maybe take a long time..." % machine})
+                    line = line.replace("EDGEBUILD=0", "EDGEBUILD=1")
+                file_data += line
+        with open(buildconf, "w") as f:
+            f.write(file_data)
     else:
         emit("my_response", {"data": "Doesn't support machine %s" % machine})
 
