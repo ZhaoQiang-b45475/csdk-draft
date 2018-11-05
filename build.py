@@ -18,6 +18,7 @@ osusername = getuser()
 buildpdir = "/home/" + osusername + "/work/"
 builddir = buildpdir + "flexbuild/"
 buildconf = "buildconf"
+csdkdir = ""
 
 '''
 thread = None
