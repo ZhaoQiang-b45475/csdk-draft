@@ -16,7 +16,6 @@ def build_handler():
     while True:
         count += 1
         time.sleep(5)
-        print "=========count = %d" % count
         os.chdir(csdkdir)
         with open(buildconf, "r") as f:
             for line in f:
@@ -30,10 +29,7 @@ def realbuild():
     os.chdir(builddir)
     enEdge()
     command = "source ./setup.env && flex-builder -m ls1043ardb -a arm64"
-    print "=============run build"
     ret = os.system(command)
-    print "============ret = ", ret
-    print "=============finish build"
     if not ret:
         mksolution()
         modifyfile(csdkdir+"/"+buildconf, "EDGEBUILD=1", "EDGEBUILD=4")
