@@ -31,7 +31,7 @@ def background_thread():
             socketio.emit("my_response", {"data": "Build failed..."}, namespace='/test')
             modifyfile(csdkdir+"/"+buildconf, "EDGEBUILD=3", "EDGEBUILD=0")
         elif readstrfromfile(csdkdir+"/"+buildconf, "EDGEBUILD=4"):
-            socketio.emit("my_response", {"data": "Build success..."})
+            socketio.emit("my_response", {"data": "Build success..."},namespace='/test')
             modifyfile(csdkdir+"/"+buildconf, "EDGEBUILD=4", "EDGEBUILD=0")
 
 def sendmessage(message):
